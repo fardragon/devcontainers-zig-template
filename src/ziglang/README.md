@@ -1,17 +1,16 @@
 
-# Hello, World (hello)
+# Devcontainers Ziglang template (ziglang)
 
-A zig Template
+Devcontainers template for Ziglang. Contains ZLS and Zig extensions for VSCode
 
 ## Options
 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
-| imageVariant | Ubuntu version (use ubuntu-22.04 or ubuntu-18.04 on local arm64/Apple Silicon): | string | jammy |
-| greeting | Select a pre-made greeting, or enter your own | string | hey |
+| zigVersion | Zig compiler version | string | 0.13.0 |
 
 
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-template.json](https://github.com/devcontainers/template-starter/blob/main/src/hello/devcontainer-template.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-template.json](https://github.com/fardragon/devcontainers-zig-template/blob/main/src/ziglang/devcontainer-template.json).  Add additional notes to a `NOTES.md`._
