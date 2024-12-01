@@ -4,7 +4,7 @@ source test-utils.sh
 
 # Template specific tests
 check "distro" lsb_release -c
-check "zig" [ "$(zig version)" == "0.13.0" ]
+check "zig" [ "$(zig version)" == "0.12.0" ]
 
 # Report result
 reportResults
