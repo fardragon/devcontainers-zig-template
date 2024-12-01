@@ -1,0 +1,12 @@
+{
+    "id": "ziglang",
+    "version": "0.13.0",
+    "name": "Devcontainers Zig template",
+    "description": "TODO",
+    "documentationURL": "https://github.com/fardragon/devcontainers-zig-template/tree/main/src/zig",
+    "licenseURL": "https://github.com/fardragon/devcontainers-zig-template/blob/main/LICENSE",
+    "options": {},
+    "platforms": [
+        "Any"
+    ]
+}
