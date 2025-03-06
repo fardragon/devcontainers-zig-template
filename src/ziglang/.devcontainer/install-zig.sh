@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -xe
+set -e
 
 
 MINISIGN_VERSION="$2"
@@ -17,26 +17,27 @@ ZLS_URL="https://builds.zigtools.org/zls-linux-x86_64-${ZIG_VERSION}.tar.xz"
 ZLS_SIGNATURE_URL="https://builds.zigtools.org/zls-linux-x86_64-${ZIG_VERSION}.tar.xz.minisig"
 ZLS_PUBKEY="RWR+9B91GBZ0zOjh6Lr17+zKf5BoSuFvrx2xSeDE57uIYvnKBGmMjOex"
 
+alias get_file="curl --location --remote-name --no-progress-meter --fail"
 
 mkdir -p "/home/vscode/.local/bin"
 
-curl -OsL ${MINISIGN_URL}
+get_file "${MINISIGN_URL}"
 tar -xzf "minisign-${MINISIGN_VERSION}-linux.tar.gz"
 ln -s /home/vscode/minisign-linux/x86_64/minisign /home/vscode/.local/bin/minisign
 
-curl -OsL ${MINISIGN_SIGNATURE_URL}
-minisign -Vm minisign-${MINISIGN_VERSION}-linux.tar.gz -P ${MINISIGN_PUBKEY}
+get_file "${MINISIGN_SIGNATURE_URL}"
+minisign -Vm minisign-"${MINISIGN_VERSION}"-linux.tar.gz -P ${MINISIGN_PUBKEY}
 
-curl -OsL ${ZIG_URL}
-curl -OsL ${ZIG_SIGNATURE_URL}
-minisign -Vm zig-linux-x86_64-${ZIG_VERSION}.tar.xz -P ${ZIG_PUBKEY}
+get_file "${ZIG_URL}"
+get_file "${ZIG_SIGNATURE_URL}"
+minisign -Vm zig-linux-x86_64-"${ZIG_VERSION}".tar.xz -P ${ZIG_PUBKEY}
 
 tar -xf "zig-linux-x86_64-${ZIG_VERSION}.tar.xz"
 ln -s "/home/vscode/zig-linux-x86_64-${ZIG_VERSION}/zig" /home/vscode/.local/bin/zig
 
-curl -OsL ${ZLS_URL}
-curl -OsL ${ZLS_SIGNATURE_URL}
-minisign -Vm zls-linux-x86_64-${ZIG_VERSION}.tar.xz -P ${ZLS_PUBKEY}
+get_file "${ZLS_URL}"
+get_file "${ZLS_SIGNATURE_URL}"
+minisign -Vm zls-linux-x86_64-"${ZIG_VERSION}".tar.xz -P ${ZLS_PUBKEY}
 
 tar -xf "zls-linux-x86_64-${ZIG_VERSION}.tar.xz"
 ln -s "/home/vscode/zls" /home/vscode/.local/bin/zls
