@@ -10,9 +10,10 @@
             "type": "string",
             "description": "Zig compiler version",
             "proposals": [
-                "0.13.0"
+                "0.13.0",
+                "0.14.0"
             ],
-            "default": "0.13.0"
+            "default": "0.14.0"
         }
     },
     "platforms": [
