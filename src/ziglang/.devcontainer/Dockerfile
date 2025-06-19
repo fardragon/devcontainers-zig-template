@@ -6,5 +6,5 @@ USER vscode
 WORKDIR /home/vscode
 ENV PATH="$PATH:/home/vscode/.local/bin"
 
-ADD --chown=vscode:vscode install-zig.sh install-zig.sh
-RUN chmod +x install-zig.sh && ./install-zig.sh ${ZIG_VERSION} ${MINISIGN_VERSION}
+ADD --chown=vscode:vscode --chmod=754 install-zig.sh install-zig.sh
+RUN ./install-zig.sh ${ZIG_VERSION} ${MINISIGN_VERSION}
