@@ -5,6 +5,7 @@ This repo provides a devcontainer template for Ziglang development.
 ## Supported Zig versions
 * 0.13.0
 * 0.14.0
+* 0.14.1
 
 
 ## Included tools
