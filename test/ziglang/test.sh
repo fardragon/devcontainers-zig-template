@@ -6,7 +6,7 @@ source test-utils.sh
 check "distro" lsb_release -c
 
 check "zig_version" zig version
-check "zig_version_compare" [ "$(zig version)" == "0.14.0" ]
+check "zig_version_compare" [ "$(zig version)" == "0.14.1" ]
 
 check "zls_version" zls --version
 check "zls_version_compare" [ "$(zls --version)" == "0.14.0" ]
