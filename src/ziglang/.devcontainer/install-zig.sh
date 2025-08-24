@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -e
+set -ex
 
 version_lte() {
     printf '%s\n%s' "$1" "$2" | sort -C -V
