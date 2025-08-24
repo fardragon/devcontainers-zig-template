@@ -7,7 +7,7 @@ Devcontainers template for Ziglang. Contains ZLS and Zig extensions for VSCode
 
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
-| zigVersion | Zig compiler version | string | 0.14.1 |
+| zigVersion | Zig compiler version | string | 0.15.1 |
 
 
 
