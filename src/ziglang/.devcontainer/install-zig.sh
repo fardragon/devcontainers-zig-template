@@ -26,8 +26,8 @@ verify_file () {
 }
 
 get_zig_mirror() {
-    ZIG_VERSION="$1"
-    ZIG_MIRROR="$2"
+    ZIG_MIRROR="$1"
+    ZIG_VERSION="$2"
     ZIG_TARBALL_NAME="$3"
 
     ZIG_URL="${ZIG_TARBALL_NAME}/${ZIG_VERSION}/${ZIG_TARBALL_NAME}.tar.xz"
