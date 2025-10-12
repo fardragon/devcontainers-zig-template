@@ -27,8 +27,8 @@ get_zig_mirror() {
     local ZIG_MIRROR="$1"
     local ZIG_TARBALL_NAME="$2"
 
-    local ZIG_URL="${ZIG_MIRROR}/${ZIG_TARBALL_NAME}.tar.xz"
-    local ZIG_SIGNATURE_URL="${ZIG_MIRROR}/${ZIG_TARBALL_NAME}.tar.xz.minisig"
+    local ZIG_URL="${ZIG_MIRROR}/${ZIG_TARBALL_NAME}.tar.xz?source=devcontainers-zig-template"
+    local ZIG_SIGNATURE_URL="${ZIG_MIRROR}/${ZIG_TARBALL_NAME}.tar.xz.minisig?source=devcontainers-zig-template"
     local ZIG_PUBKEY="RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U"
 
     curl --location --remote-name --no-progress-meter --fail "$ZIG_URL" && \
