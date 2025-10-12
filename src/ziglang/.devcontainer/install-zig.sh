@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
 
-set -ex
-
 version_lt() {
     if [ "$1" = "$2" ]; then
         return 1
@@ -17,8 +15,8 @@ get_file() {
 }
 
 verify_file () {
-    FILE="$1"
-    PUBKEY="$2"
+    local FILE="$1"
+    local PUBKEY="$2"
     minisign -Vm "${FILE}" -P "${PUBKEY}" || {
         echo "Failed to verify ${FILE}" 1>&2
         exit 1
@@ -26,13 +24,12 @@ verify_file () {
 }
 
 get_zig_mirror() {
-    ZIG_MIRROR="$1"
-    ZIG_VERSION="$2"
-    ZIG_TARBALL_NAME="$3"
+    local ZIG_MIRROR="$1"
+    local ZIG_TARBALL_NAME="$2"
 
-    ZIG_URL="${ZIG_TARBALL_NAME}/${ZIG_VERSION}/${ZIG_TARBALL_NAME}.tar.xz"
-    ZIG_SIGNATURE_URL="${ZIG_TARBALL_NAME}/${ZIG_VERSION}/${ZIG_TARBALL_NAME}.tar.xz.minisig"
-    ZIG_PUBKEY="RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U"
+    local ZIG_URL="${ZIG_MIRROR}/${ZIG_TARBALL_NAME}.tar.xz"
+    local ZIG_SIGNATURE_URL="${ZIG_MIRROR}/${ZIG_TARBALL_NAME}.tar.xz.minisig"
+    local ZIG_PUBKEY="RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U"
 
     curl --location --remote-name --no-progress-meter --fail "$ZIG_URL" && \
     curl --location --remote-name --no-progress-meter --fail "$ZIG_SIGNATURE_URL" && \
@@ -40,22 +37,43 @@ get_zig_mirror() {
 }
 
 get_zig_tarball() {
-    ZIG_VERSION="$1"
+    local ZIG_VERSION="$1"
 
     # Tarball naming changed after Zig 0.14.1
     if version_lt "${ZIG_VERSION}" "0.14.1"; then
-        ZIG_TARBALL_NAME="zig-linux-x86_64-${ZIG_VERSION}"
+        local ZIG_TARBALL_NAME="zig-linux-x86_64-${ZIG_VERSION}"
     else
-        ZIG_TARBALL_NAME="zig-x86_64-linux-${ZIG_VERSION}"
+        local ZIG_TARBALL_NAME="zig-x86_64-linux-${ZIG_VERSION}"
     fi
 
-    get_zig_mirror "https://ziglang.org/download" "${ZIG_VERSION}" "${ZIG_TARBALL_NAME}" || {
-        echo "Failed to download zig from mirror" 1>&2
+    # Get community mirror list
+    get_file "https://ziglang.org/download/community-mirrors.txt"
+
+    # Randomize the mirror list
+    local tmpfile=$(mktemp "${file}.XXXXXX") || exit 1
+    awk 'BEGIN { srand() } { printf "%f\t%s\n", rand(), $0 }' "community-mirrors.txt" | sort -k1,1n | cut -f2- > "${tmpfile}"
+    mv "${tmpfile}" "community-mirrors.txt"
+
+    while IFS= read -r URL; do
+        get_zig_mirror "${URL}" "${ZIG_TARBALL_NAME}"
+        if [ $? -eq 0 ]; then
+            tar -xf "${ZIG_TARBALL_NAME}.tar.xz"
+            ln -s "/home/vscode/${ZIG_TARBALL_NAME}/zig" /home/vscode/.local/bin/zig
+            return 0
+        else
+            echo "Failed to download zig from community mirror: ${URL}" 1>&2
+        fi
+    done < "community-mirrors.txt"
+
+    echo "All community mirrors failed. Falling back to official server" 1>&2
+    get_zig_mirror "https://ziglang.org/download/${ZIG_VERSION}" "${ZIG_TARBALL_NAME}" || {
+        echo "Failed to download zig from all mirrors and official server" 1>&2
         exit 1
     }
 
     tar -xf "${ZIG_TARBALL_NAME}.tar.xz"
     ln -s "/home/vscode/${ZIG_TARBALL_NAME}/zig" /home/vscode/.local/bin/zig
+    return 0
 }
 
 MINISIGN_VERSION="$2"
