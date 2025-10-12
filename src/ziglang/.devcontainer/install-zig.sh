@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-set -e
+set -ex
 
 version_lt() {
     if [ "$1" = "$2" ]; then
@@ -36,7 +36,7 @@ get_zig_mirror() {
 
     curl --location --remote-name --no-progress-meter --fail "$ZIG_URL" && \
     curl --location --remote-name --no-progress-meter --fail "$ZIG_SIGNATURE_URL" && \
-    minisign -Vm "${ZIG_TARBALL_NAME}" -P "${ZIG_PUBKEY}"
+    minisign -Vm "${ZIG_TARBALL_NAME}.tar.xz" -P "${ZIG_PUBKEY}"
 }
 
 get_zig_tarball() {
