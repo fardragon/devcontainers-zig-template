@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -e
 
 version_lt() {
     if [ "$1" = "$2" ]; then
@@ -76,24 +77,28 @@ get_zig_tarball() {
     return 0
 }
 
+get_zls_version_for_nightly_zig() {
+    local NIGHTLY_ZIG_VERSION="$1"
+    local ZLS_SELECT_VERSION=$(curl --location --no-progress-meter --fail -G  "https://releases.zigtools.org/v1/zls/select-version" \
+        --data-urlencode "zig_version=${NIGHTLY_ZIG_VERSION}" --data-urlencode "compatibility=only-runtime")
+
+    # Check for errors
+    local HAS_ERROR_CODE=$(echo "${ZLS_SELECT_VERSION}" | jq -e 'has("code")')
+    if [ "${HAS_ERROR_CODE}" = "true" ]; then
+        local ERROR_MESSAGE=$(echo "${ZLS_SELECT_VERSION}" | jq -r '.message')
+        echo "Failed to get zls version for nightly zig: ${ERROR_MESSAGE}"
+        exit 1
+    fi
+
+    echo "${ZLS_SELECT_VERSION}" | jq -r '.version' 
+}
+
 MINISIGN_VERSION="$2"
 MINISIGN_URL="https://github.com/jedisct1/minisign/releases/download/${MINISIGN_VERSION}/minisign-${MINISIGN_VERSION}-linux.tar.gz"
 MINISIGN_SIGNATURE_URL="https://github.com/jedisct1/minisign/releases/download/${MINISIGN_VERSION}/minisign-${MINISIGN_VERSION}-linux.tar.gz.minisig"
 MINISIGN_PUBKEY="RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3"
 
 ZIG_VERSION="$1"
-ZLS_VERSION="$(echo "${ZIG_VERSION}" | cut -d. -f1,2).0"
-
-# ZLS Tarball naming changed after ZLS 0.15.0
-if version_lt "${ZLS_VERSION}" "0.15.0"; then
-    ZLS_TARBALL_NAME="zls-linux-x86_64-${ZLS_VERSION}"
-else
-    ZLS_TARBALL_NAME="zls-x86_64-linux-${ZLS_VERSION}"
-fi
-
-ZLS_URL="https://builds.zigtools.org/${ZLS_TARBALL_NAME}.tar.xz"
-ZLS_SIGNATURE_URL="https://builds.zigtools.org/${ZLS_TARBALL_NAME}.tar.xz.minisig"
-ZLS_PUBKEY="RWR+9B91GBZ0zOjh6Lr17+zKf5BoSuFvrx2xSeDE57uIYvnKBGmMjOex"
 
 mkdir -p "/home/vscode/.local/bin"
 
@@ -103,6 +108,34 @@ ln -s /home/vscode/minisign-linux/x86_64/minisign /home/vscode/.local/bin/minisi
 
 get_file "${MINISIGN_SIGNATURE_URL}"
 verify_file minisign-"${MINISIGN_VERSION}"-linux.tar.gz ${MINISIGN_PUBKEY}
+
+if [ "${ZIG_VERSION}" = "nightly" ]; then
+    ZIG_VERSION=$(curl --location --no-progress-meter --fail https://ziglang.org/download/index.json | jq --raw-output .master.version)
+    if [ -z "${ZIG_VERSION}" ]; then
+        echo "Failed to retrieve latest nightly version" 1>&2
+        exit 1
+    fi
+
+    echo "Latest nightly version is ${ZIG_VERSION}"
+    echo "Trying to find matching ZLS version"
+    ZLS_VERSION=$(get_zls_version_for_nightly_zig "${ZIG_VERSION}")
+    echo "Using ZLS version ${ZLS_VERSION}"
+    ZLS_TARBALL_NAME="zls-x86_64-linux-${ZLS_VERSION}"
+else
+    echo "Using zig version ${ZIG_VERSION}"
+
+    ZLS_VERSION="$(echo "${ZIG_VERSION}" | cut -d. -f1,2).0"
+    # ZLS Tarball naming changed after ZLS 0.15.0
+    if version_lt "${ZLS_VERSION}" "0.15.0"; then
+        ZLS_TARBALL_NAME="zls-linux-x86_64-${ZLS_VERSION}"
+    else
+        ZLS_TARBALL_NAME="zls-x86_64-linux-${ZLS_VERSION}"
+    fi
+fi
+
+ZLS_URL="https://builds.zigtools.org/${ZLS_TARBALL_NAME}.tar.xz"
+ZLS_SIGNATURE_URL="https://builds.zigtools.org/${ZLS_TARBALL_NAME}.tar.xz.minisig"
+ZLS_PUBKEY="RWR+9B91GBZ0zOjh6Lr17+zKf5BoSuFvrx2xSeDE57uIYvnKBGmMjOex"
 
 get_zig_tarball "${ZIG_VERSION}"
 

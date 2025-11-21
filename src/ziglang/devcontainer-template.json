@@ -1,6 +1,6 @@
 {
     "id": "ziglang",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "name": "Devcontainers Ziglang template",
     "description": "Devcontainers template for Ziglang. Contains ZLS and Zig extensions for VSCode",
     "documentationURL": "https://github.com/fardragon/devcontainers-zig-template/tree/main/src/ziglang",
@@ -10,6 +10,7 @@
             "type": "string",
             "description": "Zig compiler version",
             "proposals": [
+                "nightly",
                 "0.13.0",
                 "0.14.0",
                 "0.14.1",
